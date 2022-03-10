@@ -5,9 +5,9 @@ package graph
 
 import (
 	"context"
-	generated1 "osu/graph/generated"
 	"time"
 
+	generated1 "github.com/makinap/osu/graph/generated"
 	"github.com/yuuu/gqlgen-echo-sample/graph/model"
 )
 
@@ -27,7 +27,7 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 }
 
 func (r *queryResolver) Tasks(ctx context.Context) ([]*model.Task, error) {
-	tasks := []*model.Task{}
+	var tasks []*model.Task
 
 	r.DB.Find(&tasks)
 

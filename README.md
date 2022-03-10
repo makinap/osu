@@ -16,3 +16,25 @@ osu
 
 `gqlgen`
 
+
+
+Graph examples
+```
+{
+  tasks{
+    id, title, note
+  }
+}
+```
+
+```
+mutation {
+  createTask(input: {
+      title: "ee",
+      note: "aa"
+    }) {
+      title
+      note
+  }
+}
+```

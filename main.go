@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	db, err := gorm.Open( // 修正
+	db, err := gorm.Open(
 		"postgres",
 		fmt.Sprintf(
 			"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
