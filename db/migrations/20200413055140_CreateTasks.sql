@@ -1,8 +1,10 @@
 
 -- +goose Up
 -- SQL in section 'Up' is executed when this migration is applied
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE tasks (
-   id SERIAL NOT NULL,
+   id uuid DEFAULT uuid_generate_v4()  NOT NULL,
    title varchar(255) DEFAULT NULL,
    note text DEFAULT NULL,
    completed integer DEFAULT 0,
