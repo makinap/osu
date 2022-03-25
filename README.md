@@ -38,3 +38,23 @@ mutation {
   }
 }
 ```
+
+```
+mutation {
+  auth{
+    register(input: {
+      name: "my name",
+      email: "tineo@example.com",
+      password: "1234"
+    })
+  }
+}
+```
+
+```
+mutation {
+  auth{
+   login(email: "tineo@example.com",password: "1234")
+  }
+}
+```
