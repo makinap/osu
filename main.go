@@ -1,23 +1,26 @@
 package main
 
 import (
-	"fmt"
+	"github.com/makinap/osu/config"
+	"github.com/makinap/osu/migration"
+
+	//"fmt"
 	"log"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	"github.com/jinzhu/gorm"
+	//"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
-	"github.com/yuuu/gqlgen-echo-sample/graph"
-	"github.com/yuuu/gqlgen-echo-sample/graph/generated"
+	"github.com/makinap/osu/graph"
+	"github.com/makinap/osu/graph/generated"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
 func main() {
-	db, err := gorm.Open(
+	/*db, err := gorm.Open(
 		"postgres",
 		fmt.Sprintf(
 			"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
@@ -26,14 +29,19 @@ func main() {
 	)
 	if err != nil {
 		log.Fatalln(err)
-	}
+	}*/
+	migration.MigrateTable()
 
+	db := config.GetDB()
 	e := echo.New()
 
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
 	e.GET("/", welcome())
+
+	//c := generated.Config{Resolvers: &graph.Resolver{DB: db}}
+	//c.Directives.Auth = directives.Auth
 
 	graphqlHandler := handler.NewDefaultServer(
 		generated.NewExecutableSchema(
@@ -52,7 +60,7 @@ func main() {
 		return nil
 	})
 
-	err = e.Start(":3000")
+	err := e.Start(":3000")
 	if err != nil {
 		log.Fatalln(err)
 	}

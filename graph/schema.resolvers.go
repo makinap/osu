@@ -5,11 +5,16 @@ package graph
 
 import (
 	"context"
+	"github.com/makinap/osu/service"
+
+	//"fmt"
 	"time"
 
-	generated1 "github.com/makinap/osu/graph/generated"
-	"github.com/yuuu/gqlgen-echo-sample/graph/model"
+	"github.com/makinap/osu/graph/generated"
+	"github.com/makinap/osu/graph/model"
 )
+
+
 
 func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) (*model.Task, error) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
@@ -26,6 +31,10 @@ func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) 
 	return &task, nil
 }
 
+func (r *mutationResolver) Auth(ctx context.Context) (*model.AuthOps, error) {
+	return &model.AuthOps{}, nil
+}
+
 func (r *queryResolver) Tasks(ctx context.Context) ([]*model.Task, error) {
 	var tasks []*model.Task
 
@@ -34,11 +43,36 @@ func (r *queryResolver) Tasks(ctx context.Context) ([]*model.Task, error) {
 	return tasks, nil
 }
 
-// Mutation returns generated1.MutationResolver implementation.
-func (r *Resolver) Mutation() generated1.MutationResolver { return &mutationResolver{r} }
+func (r authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, email string, password string) (interface{}, error) {
+	return service.UserLogin(ctx, email, password)
+}
 
-// Query returns generated1.QueryResolver implementation.
-func (r *Resolver) Query() generated1.QueryResolver { return &queryResolver{r} }
+func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, input model.NewUser) (interface{}, error) {
+	return service.UserRegister(ctx, input)
+}
 
+/*func (r *mutationResolver) Auth(ctx context.Context) (*model.AuthOps, error) {
+	return &model.AuthOps{}, nil
+}*/
+
+func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
+	return service.UserGetByID(ctx, id)
+}
+
+func (r *queryResolver) Protected(ctx context.Context) (string, error) {
+	return "Success", nil
+}
+
+
+// AuthOps returns generated.AuthOpsResolver implementation.
+func (r *Resolver) AuthOps() generated.AuthOpsResolver { return &authOpsResolver{r} }
+
+// Mutation returns generated.MutationResolver implementation.
+func (r *Resolver) Mutation() generated.MutationResolver { return &mutationResolver{r} }
+
+// Query returns generated.QueryResolver implementation.
+func (r *Resolver) Query() generated.QueryResolver { return &queryResolver{r} }
+
+type authOpsResolver struct{ *Resolver }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }

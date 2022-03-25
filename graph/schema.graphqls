@@ -1,3 +1,7 @@
+directive @goField(forceResolver: Boolean, name: String) on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+scalar Any
+
 type Task {
   id: ID!
   title: String!
@@ -12,10 +16,34 @@ input NewTask {
   note: String!
 }
 
+
+type User {
+  id: ID!
+  name: String!
+  email: String!
+  password: String!
+}
+
+input NewUser {
+  name: String!
+  email: String!
+  password: String!
+}
+
+type AuthOps {
+  login(email: String!, password: String!): Any! @goField(forceResolver: true)
+  register(input: NewUser!): Any! @goField(forceResolver: true)
+}
+
+
 type Mutation {
   createTask(input: NewTask!): Task!
+  #createUser(input: NewUser!): User!
+  auth: AuthOps! @goField(forceResolver: true)
 }
 
 type Query {
   tasks: [Task!]!
+  user(id: ID!): User! @goField(forceResolver: true)
 }
+
