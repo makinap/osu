@@ -47,7 +47,10 @@ func UserLogin(ctx context.Context, email string, password string) (interface{},
 	}
 
 	if err := tools.ComparePassword(getUser.Password, password); err != nil {
-		return nil, err
+		//return nil, err
+		return nil, &gqlerror.Error{
+			Message: "Wrong password",
+		}
 	}
 
 	token, err := JwtGenerate(ctx, getUser.ID)

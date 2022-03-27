@@ -2,37 +2,41 @@ package middlewares
 
 import (
 	"context"
+	"github.com/labstack/echo"
 	"github.com/makinap/osu/service"
+	"log"
 	"net/http"
 )
 
 type authString string
 
-func AuthMiddleware(next http.Handler) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		auth := r.Header.Get("Authorization")
+func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
+	log.Println("Using auth middleware ")
+	return func(c echo.Context) error {
 
+		auth := c.Request().Header.Get("Authorization")
 		if auth == "" {
-			next.ServeHTTP(w, r)
-			return
+			next.ServeHTTP(c.Response().Writer, c.Request())
+			//return echo.NewHTTPError(http.StatusUnauthorized, "Please provide credentials")
+			return next(c)
 		}
 
 		bearer := "Bearer "
 		auth = auth[len(bearer):]
 
 		validate, err := service.JwtValidate(context.Background(), auth)
+
 		if err != nil || !validate.Valid {
-			http.Error(w, "Invalid token", http.StatusForbidden)
-			return
+			return echo.NewHTTPError(http.StatusUnauthorized, "Please provide valid credentials")
+			//return next(c)
 		}
 
 		customClaim, _ := validate.Claims.(*service.JwtCustomClaim)
 
-		ctx := context.WithValue(r.Context(), authString("auth"), customClaim)
-
-		r = r.WithContext(ctx)
-		next.ServeHTTP(w, r)
-	})
+		ctx := context.WithValue(c.Request().Context(), authString("auth"), customClaim)
+		c.SetRequest(c.Request().WithContext(ctx))
+		return next(c)
+	}
 }
 
 func CtxValue(ctx context.Context) *service.JwtCustomClaim {

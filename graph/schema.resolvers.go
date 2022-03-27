@@ -5,16 +5,21 @@ package graph
 
 import (
 	"context"
-	"github.com/makinap/osu/service"
-
-	//"fmt"
+	"fmt"
 	"time"
 
 	"github.com/makinap/osu/graph/generated"
 	"github.com/makinap/osu/graph/model"
+	"github.com/makinap/osu/service"
 )
 
+func (r *authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, email string, password string) (interface{}, error) {
+	return service.UserLogin(ctx, email, password)
+}
 
+func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, input model.NewUser) (interface{}, error) {
+	panic(fmt.Errorf("not implemented"))
+}
 
 func (r *mutationResolver) CreateTask(ctx context.Context, input model.NewTask) (*model.Task, error) {
 	timestamp := time.Now().Format("2006-01-02 15:04:05")
@@ -43,26 +48,9 @@ func (r *queryResolver) Tasks(ctx context.Context) ([]*model.Task, error) {
 	return tasks, nil
 }
 
-func (r authOpsResolver) Login(ctx context.Context, obj *model.AuthOps, email string, password string) (interface{}, error) {
-	return service.UserLogin(ctx, email, password)
-}
-
-func (r *authOpsResolver) Register(ctx context.Context, obj *model.AuthOps, input model.NewUser) (interface{}, error) {
-	return service.UserRegister(ctx, input)
-}
-
-/*func (r *mutationResolver) Auth(ctx context.Context) (*model.AuthOps, error) {
-	return &model.AuthOps{}, nil
-}*/
-
 func (r *queryResolver) User(ctx context.Context, id string) (*model.User, error) {
 	return service.UserGetByID(ctx, id)
 }
-
-func (r *queryResolver) Protected(ctx context.Context) (string, error) {
-	return "Success", nil
-}
-
 
 // AuthOps returns generated.AuthOpsResolver implementation.
 func (r *Resolver) AuthOps() generated.AuthOpsResolver { return &authOpsResolver{r} }

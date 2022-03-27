@@ -2,9 +2,8 @@ package directives
 
 import (
 	"context"
-	"github.com/makinap/osu/middlewares"
-
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/makinap/osu/middlewares"
 	"github.com/vektah/gqlparser/v2/gqlerror"
 )
 
@@ -15,6 +14,5 @@ func Auth(ctx context.Context, obj interface{}, next graphql.Resolver) (interfac
 			Message: "Access Denied",
 		}
 	}
-
 	return next(ctx)
 }

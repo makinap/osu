@@ -2,15 +2,14 @@ package main
 
 import (
 	"github.com/makinap/osu/config"
+	"github.com/makinap/osu/directives"
+	"github.com/makinap/osu/middlewares"
 	"github.com/makinap/osu/migration"
-
-	//"fmt"
 	"log"
 	"net/http"
 
 	"github.com/99designs/gqlgen/graphql/handler"
 	"github.com/99designs/gqlgen/graphql/playground"
-	//"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/postgres"
 	"github.com/makinap/osu/graph"
 	"github.com/makinap/osu/graph/generated"
@@ -20,16 +19,9 @@ import (
 )
 
 func main() {
-	/*db, err := gorm.Open(
-		"postgres",
-		fmt.Sprintf(
-			"host=%s port=%d user=%s dbname=%s password=%s sslmode=disable",
-			"127.0.0.1", 5432, "postgres", "postgres", "postgres",
-		),
-	)
-	if err != nil {
-		log.Fatalln(err)
-	}*/
+
+
+
 	migration.MigrateTable()
 
 	db := config.GetDB()
@@ -38,14 +30,16 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 
+	e.Use(middlewares.AuthMiddleware)
+
 	e.GET("/", welcome())
 
-	//c := generated.Config{Resolvers: &graph.Resolver{DB: db}}
-	//c.Directives.Auth = directives.Auth
+	c := generated.Config{Resolvers: &graph.Resolver{DB: db}}
+	c.Directives.Auth = directives.Auth
 
 	graphqlHandler := handler.NewDefaultServer(
-		generated.NewExecutableSchema(
-			generated.Config{Resolvers: &graph.Resolver{DB: db}},
+		generated.NewExecutableSchema( c,
+			//generated.Config{Resolvers: &graph.Resolver{DB: db}},
 		),
 	)
 	playgroundHandler := playground.Handler("GraphQL", "/query")
