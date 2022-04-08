@@ -13,7 +13,7 @@ type authString string
 func AuthMiddleware(next echo.HandlerFunc) echo.HandlerFunc {
 	log.Println("Using auth middleware ")
 	return func(c echo.Context) error {
-
+		//ServeHTTP(w http.ResponseWriter, r *http.Request)
 		auth := c.Request().Header.Get("Authorization")
 		if auth == "" {
 			next.ServeHTTP(c.Response().Writer, c.Request())
